@@ -18,8 +18,6 @@ module Api
 
     def set_band
       @band = Band.find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      render json: { error: "Band not found" }, status: :not_found
     end
 
     def band_params

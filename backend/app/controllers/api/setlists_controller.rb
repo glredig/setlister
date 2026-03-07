@@ -19,7 +19,7 @@ module Api
     end
 
     def show
-      render json: setlist_json
+      render json: @setlist.as_detailed_json
     end
 
     def update
@@ -43,24 +43,6 @@ module Api
 
     def setlist_params
       params.require(:setlist).permit(:name, :date, :notes)
-    end
-
-    def setlist_json
-      @setlist.as_json(
-        only: [:id, :name, :date, :notes],
-        include: {
-          setlist_songs: {
-            only: [:id, :position],
-            include: {
-              song: { only: [:id, :title, :artist, :tempo, :key, :time_signature, :duration] },
-              song_performance_config: {
-                only: [:id, :lead_vocalist_id, :backup_vocalist_ids, :guitar_solo_id,
-                       :instrument_overrides, :free_text_notes]
-              }
-            }
-          }
-        }
-      )
     end
   end
 end

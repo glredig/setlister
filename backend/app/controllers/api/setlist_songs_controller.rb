@@ -25,27 +25,7 @@ module Api
       end
 
       setlist.reload
-      render json: setlist_json(setlist)
-    end
-
-    private
-
-    def setlist_json(setlist)
-      setlist.as_json(
-        only: [:id, :name, :date, :notes],
-        include: {
-          setlist_songs: {
-            only: [:id, :position],
-            include: {
-              song: { only: [:id, :title, :artist, :tempo, :key, :time_signature, :duration] },
-              song_performance_config: {
-                only: [:id, :lead_vocalist_id, :backup_vocalist_ids, :guitar_solo_id,
-                       :instrument_overrides, :free_text_notes]
-              }
-            }
-          }
-        }
-      )
+      render json: setlist.as_detailed_json
     end
   end
 end
