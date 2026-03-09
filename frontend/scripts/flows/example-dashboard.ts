@@ -15,7 +15,7 @@ const flow: FlowFn = async (page) => {
 
 export default async function run(record: typeof recordFlow) {
   await record(flow, {
-    outputPath: 'docs/recordings/dashboard-flow.webm',
+    outputPath: '../docs/recordings/dashboard-flow.webm',
     url: 'http://localhost:3000',
   });
 }
