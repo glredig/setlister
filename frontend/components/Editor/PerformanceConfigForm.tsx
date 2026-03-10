@@ -28,6 +28,28 @@ export function PerformanceConfigForm({ config, members, onChange }: Performance
     onChange({ ...config, backup_vocalist_ids: newBackups });
   };
 
+  const handleAddSolo = () => {
+    onChange({ ...config, solos: [...config.solos, { member_id: 0, instrument: '' }] });
+  };
+
+  const handleRemoveSolo = (index: number) => {
+    onChange({ ...config, solos: config.solos.filter((_, i) => i !== index) });
+  };
+
+  const handleSoloChange = (index: number, field: 'member_id' | 'instrument', value: string) => {
+    const newSolos = config.solos.map((solo, i) => {
+      if (i !== index) return solo;
+      if (field === 'member_id') {
+        const newMemberId = Number(value);
+        const newMemberInstruments = members.find((m) => m.id === newMemberId)?.instruments || [];
+        const instrumentStillValid = newMemberInstruments.includes(solo.instrument);
+        return { member_id: newMemberId, instrument: instrumentStillValid ? solo.instrument : '' };
+      }
+      return { ...solo, [field]: value };
+    });
+    onChange({ ...config, solos: newSolos });
+  };
+
   return (
     <FormContainer>
       <FieldGroup>
@@ -68,6 +90,47 @@ export function PerformanceConfigForm({ config, members, onChange }: Performance
 
       <FieldGroup>
         <FieldLabel>Solos</FieldLabel>
+        {config.solos.map((solo, index) => (
+          <SoloRow key={`solo-${index}-${solo.member_id}`}>
+            <Select
+              value={solo.member_id || ''}
+              onChange={(e) => handleSoloChange(index, 'member_id', e.target.value)}
+              aria-label={`Solo ${index + 1} member`}
+            >
+              <option value="">Select member</option>
+              {bandMembers.map((m) => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
+            </Select>
+            <Select
+              value={solo.instrument}
+              onChange={(e) => handleSoloChange(index, 'instrument', e.target.value)}
+              aria-label={`Solo ${index + 1} instrument`}
+            >
+              <option value="">Select instrument</option>
+              {solo.member_id
+                ? (members.find((m) => m.id === solo.member_id)?.instruments || []).map((inst) => (
+                    <option key={inst} value={inst}>{inst}</option>
+                  ))
+                : bandMembers.flatMap((m) => m.instruments)
+                    .filter((v, i, a) => a.indexOf(v) === i)
+                    .map((inst) => (
+                      <option key={inst} value={inst}>{inst}</option>
+                    ))
+              }
+            </Select>
+            <RemoveButton
+              onClick={() => handleRemoveSolo(index)}
+              aria-label={`Remove solo ${index + 1}`}
+              type="button"
+            >
+              ×
+            </RemoveButton>
+          </SoloRow>
+        ))}
+        <AddButton onClick={handleAddSolo} type="button" aria-label="Add solo">
+          + Add Solo
+        </AddButton>
       </FieldGroup>
 
       <FieldGroup>
@@ -114,4 +177,48 @@ const CheckboxLabel = styled.label`
   gap: ${({ theme }) => theme.spacing.xs};
   font-size: 0.85rem;
   cursor: pointer;
+`;
+
+const SoloRow = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.sm};
+  align-items: center;
+`;
+
+const Select = styled.select`
+  background: ${({ theme }) => theme.colors.background};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 4px;
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 0.85rem;
+  flex: 1;
+`;
+
+const RemoveButton = styled.button`
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: ${({ theme }) => theme.spacing.xs};
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const AddButton = styled.button`
+  background: none;
+  border: 1px dashed ${({ theme }) => theme.colors.border};
+  border-radius: 4px;
+  color: ${({ theme }) => theme.colors.textMuted};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+  }
 `;

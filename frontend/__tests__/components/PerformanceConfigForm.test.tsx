@@ -93,4 +93,114 @@ describe('PerformanceConfigForm', () => {
       );
     });
   });
+
+  describe('Solos', () => {
+    it('renders existing solos', () => {
+      const config = {
+        ...emptyConfig,
+        solos: [{ member_id: 1, instrument: 'guitar' }],
+      };
+      renderWithTheme(
+        <PerformanceConfigForm config={config} members={mockMembers} onChange={jest.fn()} />
+      );
+
+      expect(screen.getByDisplayValue('guitar')).toBeInTheDocument();
+    });
+
+    it('adds a solo row when Add Solo is clicked', () => {
+      const onChange = jest.fn();
+      renderWithTheme(
+        <PerformanceConfigForm config={emptyConfig} members={mockMembers} onChange={onChange} />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /add solo/i }));
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          solos: [{ member_id: 0, instrument: '' }],
+        })
+      );
+    });
+
+    it('removes a solo row when remove is clicked', () => {
+      const config = {
+        ...emptyConfig,
+        solos: [
+          { member_id: 1, instrument: 'guitar' },
+          { member_id: 2, instrument: 'keys' },
+        ],
+      };
+      const onChange = jest.fn();
+      renderWithTheme(
+        <PerformanceConfigForm config={config} members={mockMembers} onChange={onChange} />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Remove solo 1' }));
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          solos: [{ member_id: 2, instrument: 'keys' }],
+        })
+      );
+    });
+
+    it('clears instrument when switching to member who does not play it', () => {
+      const config = {
+        ...emptyConfig,
+        solos: [{ member_id: 1, instrument: 'guitar' }],
+      };
+      const onChange = jest.fn();
+      renderWithTheme(
+        <PerformanceConfigForm config={config} members={mockMembers} onChange={onChange} />
+      );
+
+      // Switch to Dave (drums only) — guitar is not valid
+      fireEvent.change(screen.getByLabelText('Solo 1 member'), { target: { value: '4' } });
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          solos: [{ member_id: 4, instrument: '' }],
+        })
+      );
+    });
+
+    it('keeps instrument when switching to member who also plays it', () => {
+      const config = {
+        ...emptyConfig,
+        solos: [{ member_id: 1, instrument: 'guitar' }],
+      };
+      const onChange = jest.fn();
+      renderWithTheme(
+        <PerformanceConfigForm config={config} members={mockMembers} onChange={onChange} />
+      );
+
+      // Switch to Sarah (guitar, vocals, keys) — guitar is still valid
+      fireEvent.change(screen.getByLabelText('Solo 1 member'), { target: { value: '2' } });
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          solos: [{ member_id: 2, instrument: 'guitar' }],
+        })
+      );
+    });
+
+    it('updates solo member when dropdown changes', () => {
+      const config = {
+        ...emptyConfig,
+        solos: [{ member_id: 1, instrument: 'guitar' }],
+      };
+      const onChange = jest.fn();
+      renderWithTheme(
+        <PerformanceConfigForm config={config} members={mockMembers} onChange={onChange} />
+      );
+
+      fireEvent.change(screen.getByLabelText('Solo 1 member'), { target: { value: '2' } });
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          solos: [{ member_id: 2, instrument: 'guitar' }],
+        })
+      );
+    });
+  });
 });
