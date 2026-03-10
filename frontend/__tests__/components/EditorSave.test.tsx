@@ -26,7 +26,7 @@ const mockSetlistDetail = {
       id: 10,
       position: 1,
       song: { id: 1, title: 'Song A', artist: 'Artist A', tempo: 120, key: 'C', time_signature: '4/4', duration: 240 },
-      song_performance_config: { id: 100, lead_vocalist_id: null, backup_vocalist_ids: [], guitar_solo_id: null, instrument_overrides: {}, free_text_notes: '' },
+      song_performance_config: { id: 100, lead_vocalist_ids: [], backup_vocalist_ids: [], solos: [], instrument_overrides: {}, free_text_notes: '' },
     },
   ],
 };
@@ -51,7 +51,7 @@ describe('Editor save/cancel', () => {
           id: 11,
           position: 2,
           song: mockSongs[1],
-          song_performance_config: { id: 101, lead_vocalist_id: null, backup_vocalist_ids: [], guitar_solo_id: null, instrument_overrides: {}, free_text_notes: '' },
+          song_performance_config: { id: 101, lead_vocalist_ids: [], backup_vocalist_ids: [], solos: [], instrument_overrides: {}, free_text_notes: '' },
         },
       ],
     });

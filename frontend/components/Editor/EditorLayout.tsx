@@ -37,9 +37,9 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
       song,
       song_performance_config: {
         id: 0,
-        lead_vocalist_id: null,
+        lead_vocalist_ids: [],
         backup_vocalist_ids: [],
-        guitar_solo_id: null,
+        solos: [],
         instrument_overrides: {},
         free_text_notes: '',
       },
@@ -70,9 +70,9 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
         song_id: ss.song.id,
         position: index + 1,
         performance_config: {
-          lead_vocalist_id: ss.song_performance_config.lead_vocalist_id,
+          lead_vocalist_ids: ss.song_performance_config.lead_vocalist_ids,
           backup_vocalist_ids: ss.song_performance_config.backup_vocalist_ids,
-          guitar_solo_id: ss.song_performance_config.guitar_solo_id,
+          solos: ss.song_performance_config.solos,
           instrument_overrides: ss.song_performance_config.instrument_overrides,
           free_text_notes: ss.song_performance_config.free_text_notes,
         },
