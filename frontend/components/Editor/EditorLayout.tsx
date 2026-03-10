@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { api } from '@/lib/api';
-import { SetlistDetail, Song } from '@/lib/types';
+import { SetlistDetail, SetlistSong, Song } from '@/lib/types';
+import { RepertoirePanel } from '@/components/Editor/RepertoirePanel';
 
 interface EditorLayoutProps {
   setlistId: number;
@@ -11,7 +12,14 @@ interface EditorLayoutProps {
 export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
   const [setlist, setSetlist] = useState<SetlistDetail | null>(null);
   const [repertoire, setRepertoire] = useState<Song[]>([]);
+  const [setlistSongs, setSetlistSongs] = useState<SetlistSong[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (setlist) {
+      setSetlistSongs(setlist.setlist_songs);
+    }
+  }, [setlist]);
 
   useEffect(() => {
     Promise.all([
@@ -22,6 +30,23 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
       setRepertoire(songsData);
     }).finally(() => setLoading(false));
   }, [setlistId, bandId]);
+
+  const handleAddSong = (song: Song) => {
+    const newSetlistSong: SetlistSong = {
+      id: Date.now(),
+      position: setlistSongs.length + 1,
+      song,
+      song_performance_config: {
+        id: 0,
+        lead_vocalist_id: null,
+        backup_vocalist_ids: [],
+        guitar_solo_id: null,
+        instrument_overrides: {},
+        free_text_notes: '',
+      },
+    };
+    setSetlistSongs((prev) => [...prev, newSetlistSong]);
+  };
 
   if (loading || !setlist) return <LoadingContainer>Loading...</LoadingContainer>;
 
@@ -34,11 +59,11 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
         </HeaderActions>
       </Header>
       <Panels>
-        <LeftPanel>
-          <PanelHeader>Repertoire</PanelHeader>
-          <SearchInput type="text" placeholder="Search songs..." />
-          <p>Repertoire panel — {repertoire.length} songs available</p>
-        </LeftPanel>
+        <RepertoirePanel
+          songs={repertoire}
+          onAddSong={handleAddSong}
+          setlistSongIds={setlistSongs.map((ss) => ss.song.id)}
+        />
         <RightPanel>
           <PanelHeader>Setlist</PanelHeader>
           <p>Setlist panel — {setlist.setlist_songs.length} songs</p>
@@ -92,19 +117,6 @@ const Panels = styled.div`
   min-height: 0;
 `;
 
-const LeftPanel = styled.div`
-  width: 350px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.sm};
-  background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 8px;
-  padding: ${({ theme }) => theme.spacing.md};
-  overflow-y: auto;
-`;
-
 const RightPanel = styled.div`
   flex: 1;
   display: flex;
@@ -125,15 +137,3 @@ const PanelHeader = styled.h2`
   margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
-const SearchInput = styled.input`
-  background: ${({ theme }) => theme.colors.background};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 4px;
-  padding: ${({ theme }) => theme.spacing.sm};
-  color: ${({ theme }) => theme.colors.text};
-  font-size: 0.9rem;
-
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.textMuted};
-  }
-`;
