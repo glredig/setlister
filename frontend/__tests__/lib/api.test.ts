@@ -64,3 +64,32 @@ describe('api.setlists', () => {
     await expect(api.setlists.get(999)).rejects.toThrow('Record not found');
   });
 });
+
+describe('api.setlistSongs', () => {
+  it('bulkUpdate sends PUT with songs array', async () => {
+    const updatedSetlist = {
+      id: 1, name: 'Friday Set', date: '2026-03-20', notes: '',
+      setlist_songs: [],
+    };
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve(updatedSetlist),
+    });
+
+    const songs = [
+      { song_id: 1, position: 1, performance_config: {} },
+      { song_id: 2, position: 2, performance_config: {} },
+    ];
+
+    const result = await api.setlistSongs.bulkUpdate(1, songs);
+    expect(result).toEqual(updatedSetlist);
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:3001/api/setlists/1/songs',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ songs }),
+      })
+    );
+  });
+});

@@ -1,0 +1,202 @@
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { arrayMove } from '@dnd-kit/sortable';
+import { api } from '@/lib/api';
+import { SetlistDetail, SetlistSong, Song } from '@/lib/types';
+import { RepertoirePanel } from '@/components/Editor/RepertoirePanel';
+import { SetlistPanel } from '@/components/Editor/SetlistPanel';
+
+interface EditorLayoutProps {
+  setlistId: number;
+  bandId: number;
+}
+
+export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
+  const [setlist, setSetlist] = useState<SetlistDetail | null>(null);
+  const [repertoire, setRepertoire] = useState<Song[]>([]);
+  const [setlistSongs, setSetlistSongs] = useState<SetlistSong[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      api.setlists.get(setlistId),
+      api.songs.list(bandId),
+    ]).then(([setlistData, songsData]) => {
+      setSetlist(setlistData);
+      setSetlistSongs(setlistData.setlist_songs);
+      setRepertoire(songsData);
+    }).finally(() => setLoading(false));
+  }, [setlistId, bandId]);
+
+  const handleAddSong = (song: Song) => {
+    const newSetlistSong: SetlistSong = {
+      id: Date.now(),
+      position: setlistSongs.length + 1,
+      song,
+      song_performance_config: {
+        id: 0,
+        lead_vocalist_id: null,
+        backup_vocalist_ids: [],
+        guitar_solo_id: null,
+        instrument_overrides: {},
+        free_text_notes: '',
+      },
+    };
+    setSetlistSongs((prev) => [...prev, newSetlistSong]);
+    setIsDirty(true);
+  };
+
+  const handleReorder = (activeId: number, overId: number) => {
+    setSetlistSongs((prev) => {
+      const oldIndex = prev.findIndex((s) => s.id === activeId);
+      const newIndex = prev.findIndex((s) => s.id === overId);
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+    setIsDirty(true);
+  };
+
+  const handleRemoveSong = (setlistSongId: number) => {
+    setSetlistSongs((prev) => prev.filter((s) => s.id !== setlistSongId));
+    setIsDirty(true);
+  };
+
+  const handleSave = async () => {
+    if (!setlist) return;
+    setIsSaving(true);
+    try {
+      const songs = setlistSongs.map((ss, index) => ({
+        song_id: ss.song.id,
+        position: index + 1,
+        performance_config: {
+          lead_vocalist_id: ss.song_performance_config.lead_vocalist_id,
+          backup_vocalist_ids: ss.song_performance_config.backup_vocalist_ids,
+          guitar_solo_id: ss.song_performance_config.guitar_solo_id,
+          instrument_overrides: ss.song_performance_config.instrument_overrides,
+          free_text_notes: ss.song_performance_config.free_text_notes,
+        },
+      }));
+      const updated = await api.setlistSongs.bulkUpdate(setlist.id, songs);
+      setSetlist(updated);
+      setSetlistSongs(updated.setlist_songs);
+      setIsDirty(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    if (!setlist) return;
+    setSetlistSongs(setlist.setlist_songs);
+    setIsDirty(false);
+  };
+
+  if (loading || !setlist) return <LoadingContainer>Loading...</LoadingContainer>;
+
+  return (
+    <Container>
+      <Header>
+        <h1>{setlist.name}</h1>
+        <HeaderActions>
+          <BackLink href="/">← Back</BackLink>
+          <CancelButton onClick={handleCancel} disabled={!isDirty}>
+            Cancel
+          </CancelButton>
+          <SaveButton onClick={handleSave} disabled={!isDirty || isSaving} aria-label="Save">
+            {isSaving ? 'Saving...' : 'Save'}
+          </SaveButton>
+        </HeaderActions>
+      </Header>
+      <Panels>
+        <RepertoirePanel
+          songs={repertoire}
+          onAddSong={handleAddSong}
+          setlistSongIds={setlistSongs.map((ss) => ss.song.id)}
+        />
+        <SetlistPanel
+          setlistSongs={setlistSongs}
+          onReorder={handleReorder}
+          onRemove={handleRemoveSong}
+        />
+      </Panels>
+    </Container>
+  );
+}
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: ${({ theme }) => theme.colors.textMuted};
+`;
+
+const Container = styled.div`
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: ${({ theme }) => theme.spacing.md};
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.sm};
+  align-items: center;
+`;
+
+const BackLink = styled.a`
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 0.9rem;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
+const Panels = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.md};
+  flex: 1;
+  min-height: 0;
+`;
+
+const CancelButton = styled.button`
+  background: none;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 4px;
+  color: ${({ theme }) => theme.colors.text};
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+`;
+
+const SaveButton = styled.button`
+  background: ${({ theme }) => theme.colors.primary};
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+`;
+
+
