@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_06_235640) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_10_161215) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -54,13 +54,13 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_06_235640) do
 
   create_table "song_performance_configs", force: :cascade do |t|
     t.bigint "setlist_song_id", null: false
-    t.integer "lead_vocalist_id"
     t.integer "backup_vocalist_ids", default: [], array: true
-    t.integer "guitar_solo_id"
     t.jsonb "instrument_overrides", default: {}
     t.text "free_text_notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "lead_vocalist_ids", default: [], array: true
+    t.jsonb "solos", default: []
     t.index ["setlist_song_id"], name: "index_song_performance_configs_on_setlist_song_id", unique: true
   end
 

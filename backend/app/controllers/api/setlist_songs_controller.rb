@@ -15,9 +15,9 @@ module Api
 
           config_params = song_entry[:performance_config] || {}
           setlist_song.create_song_performance_config!(
-            lead_vocalist_id: config_params[:lead_vocalist_id],
+            lead_vocalist_ids: config_params[:lead_vocalist_ids] || [],
             backup_vocalist_ids: config_params[:backup_vocalist_ids] || [],
-            guitar_solo_id: config_params[:guitar_solo_id],
+            solos: config_params[:solos] || [],
             instrument_overrides: config_params[:instrument_overrides] || {},
             free_text_notes: config_params[:free_text_notes] || ""
           )
