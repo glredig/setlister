@@ -16,17 +16,12 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (setlist) {
-      setSetlistSongs(setlist.setlist_songs);
-    }
-  }, [setlist]);
-
-  useEffect(() => {
     Promise.all([
       api.setlists.get(setlistId),
       api.songs.list(bandId),
     ]).then(([setlistData, songsData]) => {
       setSetlist(setlistData);
+      setSetlistSongs(setlistData.setlist_songs);
       setRepertoire(songsData);
     }).finally(() => setLoading(false));
   }, [setlistId, bandId]);
