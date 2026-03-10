@@ -16,6 +16,8 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
   const [repertoire, setRepertoire] = useState<Song[]>([]);
   const [setlistSongs, setSetlistSongs] = useState<SetlistSong[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -43,6 +45,7 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
       },
     };
     setSetlistSongs((prev) => [...prev, newSetlistSong]);
+    setIsDirty(true);
   };
 
   const handleReorder = (activeId: number, overId: number) => {
@@ -51,10 +54,42 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
       const newIndex = prev.findIndex((s) => s.id === overId);
       return arrayMove(prev, oldIndex, newIndex);
     });
+    setIsDirty(true);
   };
 
   const handleRemoveSong = (setlistSongId: number) => {
     setSetlistSongs((prev) => prev.filter((s) => s.id !== setlistSongId));
+    setIsDirty(true);
+  };
+
+  const handleSave = async () => {
+    if (!setlist) return;
+    setIsSaving(true);
+    try {
+      const songs = setlistSongs.map((ss, index) => ({
+        song_id: ss.song.id,
+        position: index + 1,
+        performance_config: {
+          lead_vocalist_id: ss.song_performance_config.lead_vocalist_id,
+          backup_vocalist_ids: ss.song_performance_config.backup_vocalist_ids,
+          guitar_solo_id: ss.song_performance_config.guitar_solo_id,
+          instrument_overrides: ss.song_performance_config.instrument_overrides,
+          free_text_notes: ss.song_performance_config.free_text_notes,
+        },
+      }));
+      const updated = await api.setlistSongs.bulkUpdate(setlist.id, songs);
+      setSetlist(updated);
+      setSetlistSongs(updated.setlist_songs);
+      setIsDirty(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    if (!setlist) return;
+    setSetlistSongs(setlist.setlist_songs);
+    setIsDirty(false);
   };
 
   if (loading || !setlist) return <LoadingContainer>Loading...</LoadingContainer>;
@@ -65,6 +100,12 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
         <h1>{setlist.name}</h1>
         <HeaderActions>
           <BackLink href="/">← Back</BackLink>
+          <CancelButton onClick={handleCancel} disabled={!isDirty}>
+            Cancel
+          </CancelButton>
+          <SaveButton onClick={handleSave} disabled={!isDirty || isSaving} aria-label="Save">
+            {isSaving ? 'Saving...' : 'Save'}
+          </SaveButton>
         </HeaderActions>
       </Header>
       <Panels>
@@ -125,6 +166,37 @@ const Panels = styled.div`
   gap: ${({ theme }) => theme.spacing.md};
   flex: 1;
   min-height: 0;
+`;
+
+const CancelButton = styled.button`
+  background: none;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 4px;
+  color: ${({ theme }) => theme.colors.text};
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+`;
+
+const SaveButton = styled.button`
+  background: ${({ theme }) => theme.colors.primary};
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
 `;
 
 
