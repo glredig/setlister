@@ -36,6 +36,18 @@ export const api = {
     delete: (id: number) => request<void>(`/api/setlists/${id}`, { method: 'DELETE' }),
   },
 
+  setlistSongs: {
+    bulkUpdate: (setlistId: number, songs: Array<{
+      song_id: number;
+      position: number;
+      performance_config: Record<string, unknown>;
+    }>) =>
+      request<import('./types').SetlistDetail>(`/api/setlists/${setlistId}/songs`, {
+        method: 'PUT',
+        body: JSON.stringify({ songs }),
+      }),
+  },
+
   songs: {
     list: (bandId: number, params?: { q?: string; key?: string; tempo_min?: number }) => {
       const searchParams = new URLSearchParams();
