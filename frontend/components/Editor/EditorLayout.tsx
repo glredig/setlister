@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { arrayMove } from '@dnd-kit/sortable';
 import { api } from '@/lib/api';
 import { SetlistDetail, SetlistSong, Song } from '@/lib/types';
 import { RepertoirePanel } from '@/components/Editor/RepertoirePanel';
+import { SetlistPanel } from '@/components/Editor/SetlistPanel';
 
 interface EditorLayoutProps {
   setlistId: number;
@@ -43,6 +45,18 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
     setSetlistSongs((prev) => [...prev, newSetlistSong]);
   };
 
+  const handleReorder = (activeId: number, overId: number) => {
+    setSetlistSongs((prev) => {
+      const oldIndex = prev.findIndex((s) => s.id === activeId);
+      const newIndex = prev.findIndex((s) => s.id === overId);
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  };
+
+  const handleRemoveSong = (setlistSongId: number) => {
+    setSetlistSongs((prev) => prev.filter((s) => s.id !== setlistSongId));
+  };
+
   if (loading || !setlist) return <LoadingContainer>Loading...</LoadingContainer>;
 
   return (
@@ -59,10 +73,11 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
           onAddSong={handleAddSong}
           setlistSongIds={setlistSongs.map((ss) => ss.song.id)}
         />
-        <RightPanel>
-          <PanelHeader>Setlist</PanelHeader>
-          <p>Setlist panel — {setlist.setlist_songs.length} songs</p>
-        </RightPanel>
+        <SetlistPanel
+          setlistSongs={setlistSongs}
+          onReorder={handleReorder}
+          onRemove={handleRemoveSong}
+        />
       </Panels>
     </Container>
   );
@@ -112,23 +127,4 @@ const Panels = styled.div`
   min-height: 0;
 `;
 
-const RightPanel = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.sm};
-  background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 8px;
-  padding: ${({ theme }) => theme.spacing.md};
-  overflow-y: auto;
-`;
-
-const PanelHeader = styled.h2`
-  font-size: 1rem;
-  color: ${({ theme }) => theme.colors.textMuted};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: ${({ theme }) => theme.spacing.xs};
-`;
 
