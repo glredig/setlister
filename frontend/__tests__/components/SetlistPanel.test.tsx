@@ -30,6 +30,10 @@ describe('SetlistPanel', () => {
         setlistSongs={mockSetlistSongs}
         onReorder={jest.fn()}
         onRemove={jest.fn()}
+        expandedId={null}
+        onToggleExpand={jest.fn()}
+        onConfigChange={jest.fn()}
+        members={[]}
       />
     );
 
@@ -43,6 +47,10 @@ describe('SetlistPanel', () => {
         setlistSongs={[]}
         onReorder={jest.fn()}
         onRemove={jest.fn()}
+        expandedId={null}
+        onToggleExpand={jest.fn()}
+        onConfigChange={jest.fn()}
+        members={[]}
       />
     );
 
@@ -56,6 +64,10 @@ describe('SetlistPanel', () => {
         setlistSongs={mockSetlistSongs}
         onReorder={jest.fn()}
         onRemove={onRemove}
+        expandedId={null}
+        onToggleExpand={jest.fn()}
+        onConfigChange={jest.fn()}
+        members={[]}
       />
     );
 

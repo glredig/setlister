@@ -40,7 +40,7 @@ describe('EditorLayout', () => {
   });
 
   it('renders both panels with setlist name', async () => {
-    renderWithTheme(<EditorLayout setlistId={1} bandId={1} />);
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
 
     await waitFor(() => {
       expect(screen.getByText('Friday Night Set')).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('EditorLayout', () => {
   });
 
   it('shows loading state initially', () => {
-    renderWithTheme(<EditorLayout setlistId={1} bandId={1} />);
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 });

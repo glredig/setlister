@@ -9,5 +9,5 @@ export default function EditSetlist() {
 
   if (loading || !band || !id) return null;
 
-  return <EditorLayout setlistId={Number(id)} bandId={band.id} />;
+  return <EditorLayout setlistId={Number(id)} bandId={band.id} members={band.members} />;
 }

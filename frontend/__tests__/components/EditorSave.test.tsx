@@ -56,7 +56,7 @@ describe('Editor save/cancel', () => {
       ],
     });
 
-    renderWithTheme(<EditorLayout setlistId={1} bandId={1} />);
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
 
     await waitFor(() => {
       expect(screen.getByText('Friday Night Set')).toBeInTheDocument();
@@ -79,7 +79,7 @@ describe('Editor save/cancel', () => {
   });
 
   it('shows save button disabled when no changes', async () => {
-    renderWithTheme(<EditorLayout setlistId={1} bandId={1} />);
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
 
     await waitFor(() => {
       expect(screen.getByText('Friday Night Set')).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe('Editor save/cancel', () => {
   });
 
   it('resets changes on cancel', async () => {
-    renderWithTheme(<EditorLayout setlistId={1} bandId={1} />);
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
 
     await waitFor(() => {
       expect(screen.getByText('Friday Night Set')).toBeInTheDocument();

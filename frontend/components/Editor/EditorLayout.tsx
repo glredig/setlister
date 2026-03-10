@@ -2,22 +2,24 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { arrayMove } from '@dnd-kit/sortable';
 import { api } from '@/lib/api';
-import { SetlistDetail, SetlistSong, Song } from '@/lib/types';
+import { SetlistDetail, SetlistSong, Song, Member, SongPerformanceConfig } from '@/lib/types';
 import { RepertoirePanel } from '@/components/Editor/RepertoirePanel';
 import { SetlistPanel } from '@/components/Editor/SetlistPanel';
 
 interface EditorLayoutProps {
   setlistId: number;
   bandId: number;
+  members: Member[];
 }
 
-export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
+export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) {
   const [setlist, setSetlist] = useState<SetlistDetail | null>(null);
   const [repertoire, setRepertoire] = useState<Song[]>([]);
   const [setlistSongs, setSetlistSongs] = useState<SetlistSong[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -59,6 +61,21 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
 
   const handleRemoveSong = (setlistSongId: number) => {
     setSetlistSongs((prev) => prev.filter((s) => s.id !== setlistSongId));
+    setIsDirty(true);
+  };
+
+  const handleToggleExpand = (id: number) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
+
+  const handleConfigChange = (setlistSongId: number, updatedConfig: SongPerformanceConfig) => {
+    setSetlistSongs((prev) =>
+      prev.map((ss) =>
+        ss.id === setlistSongId
+          ? { ...ss, song_performance_config: updatedConfig }
+          : ss
+      )
+    );
     setIsDirty(true);
   };
 
@@ -118,6 +135,10 @@ export function EditorLayout({ setlistId, bandId }: EditorLayoutProps) {
           setlistSongs={setlistSongs}
           onReorder={handleReorder}
           onRemove={handleRemoveSong}
+          expandedId={expandedId}
+          onToggleExpand={handleToggleExpand}
+          onConfigChange={handleConfigChange}
+          members={members}
         />
       </Panels>
     </Container>
