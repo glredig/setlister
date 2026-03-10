@@ -10,6 +10,7 @@ interface PerformanceConfigFormProps {
 export function PerformanceConfigForm({ config, members, onChange }: PerformanceConfigFormProps) {
   const bandMembers = members.filter((m) => m.role === 'band_member');
   const backupEligible = bandMembers.filter((m) => !config.lead_vocalist_ids.includes(m.id));
+  const multiInstrumentMembers = bandMembers.filter((m) => m.instruments.length >= 2);
 
   const handleLeadToggle = (memberId: number) => {
     const isLead = config.lead_vocalist_ids.includes(memberId);
@@ -48,6 +49,20 @@ export function PerformanceConfigForm({ config, members, onChange }: Performance
       return { ...solo, [field]: value };
     });
     onChange({ ...config, solos: newSolos });
+  };
+
+  const handleOverrideChange = (memberId: number, instrument: string) => {
+    const newOverrides = { ...config.instrument_overrides };
+    if (instrument === '') {
+      delete newOverrides[String(memberId)];
+    } else {
+      newOverrides[String(memberId)] = instrument;
+    }
+    onChange({ ...config, instrument_overrides: newOverrides });
+  };
+
+  const handleNotesChange = (notes: string) => {
+    onChange({ ...config, free_text_notes: notes });
   };
 
   return (
@@ -135,10 +150,32 @@ export function PerformanceConfigForm({ config, members, onChange }: Performance
 
       <FieldGroup>
         <FieldLabel>Instrument Overrides</FieldLabel>
+        {multiInstrumentMembers.map((m) => (
+          <OverrideRow key={m.id}>
+            <MemberName>{m.name}</MemberName>
+            <Select
+              value={config.instrument_overrides[String(m.id)] || ''}
+              onChange={(e) => handleOverrideChange(m.id, e.target.value)}
+              aria-label={`Override for ${m.name}`}
+            >
+              <option value="">Default</option>
+              {m.instruments.map((inst) => (
+                <option key={inst} value={inst}>{inst}</option>
+              ))}
+            </Select>
+          </OverrideRow>
+        ))}
       </FieldGroup>
 
       <FieldGroup>
         <FieldLabel>Notes</FieldLabel>
+        <NotesTextarea
+          value={config.free_text_notes}
+          onChange={(e) => handleNotesChange(e.target.value)}
+          placeholder="Performance notes..."
+          rows={3}
+          aria-label="Notes"
+        />
       </FieldGroup>
     </FormContainer>
   );
@@ -177,6 +214,32 @@ const CheckboxLabel = styled.label`
   gap: ${({ theme }) => theme.spacing.xs};
   font-size: 0.85rem;
   cursor: pointer;
+`;
+
+const OverrideRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const MemberName = styled.span`
+  font-size: 0.85rem;
+  min-width: 80px;
+`;
+
+const NotesTextarea = styled.textarea`
+  background: ${({ theme }) => theme.colors.background};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 4px;
+  padding: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.textMuted};
+  }
 `;
 
 const SoloRow = styled.div`

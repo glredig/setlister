@@ -203,4 +203,60 @@ describe('PerformanceConfigForm', () => {
       );
     });
   });
+
+  describe('Instrument Overrides', () => {
+    it('shows dropdowns only for members with 2+ instruments', () => {
+      renderWithTheme(
+        <PerformanceConfigForm config={emptyConfig} members={mockMembers} onChange={jest.fn()} />
+      );
+
+      // Mike (3 instruments), Sarah (3), Jake (2) should appear
+      // Dave (1 instrument) should NOT appear
+      const overridesSection = screen.getByText('Instrument Overrides').closest('div')!;
+      expect(overridesSection).toHaveTextContent('Mike');
+      expect(overridesSection).toHaveTextContent('Sarah');
+      expect(overridesSection).toHaveTextContent('Jake');
+      expect(overridesSection).not.toHaveTextContent('Dave');
+    });
+
+    it('calls onChange when instrument override is selected', () => {
+      const onChange = jest.fn();
+      renderWithTheme(
+        <PerformanceConfigForm config={emptyConfig} members={mockMembers} onChange={onChange} />
+      );
+
+      const overrideSelects = screen.getAllByLabelText(/override for/i);
+      fireEvent.change(overrideSelects[0], { target: { value: 'keys' } });
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          instrument_overrides: { '1': 'keys' },
+        })
+      );
+    });
+  });
+
+  describe('Notes', () => {
+    it('renders textarea with current notes', () => {
+      const config = { ...emptyConfig, free_text_notes: 'Start with piano' };
+      renderWithTheme(
+        <PerformanceConfigForm config={config} members={mockMembers} onChange={jest.fn()} />
+      );
+
+      expect(screen.getByDisplayValue('Start with piano')).toBeInTheDocument();
+    });
+
+    it('calls onChange when notes change', () => {
+      const onChange = jest.fn();
+      renderWithTheme(
+        <PerformanceConfigForm config={emptyConfig} members={mockMembers} onChange={onChange} />
+      );
+
+      fireEvent.change(screen.getByPlaceholderText(/notes/i), { target: { value: 'New note' } });
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ free_text_notes: 'New note' })
+      );
+    });
+  });
 });
