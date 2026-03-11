@@ -4,10 +4,11 @@ class Setlist < ApplicationRecord
   has_many :songs, through: :setlist_songs
 
   validates :name, presence: true
+  validates :inter_song_gap_seconds, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   def as_detailed_json
     as_json(
-      only: [:id, :name, :date, :notes],
+      only: [:id, :name, :date, :notes, :inter_song_gap_seconds],
       include: {
         setlist_songs: {
           only: [:id, :position],

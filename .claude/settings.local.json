@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rails:*)",
+      "Bash(bundle install:*)",
+      "Bash(bundle exec:*)",
+      "Bash(DISABLE_SPRING=1 bundle exec:*)",
+      "Bash(bundle update:*)",
+      "Bash(bin/spring stop:*)",
+      "Bash(ruby:*)",
+      "Bash(rbenv versions:*)",
+      "Bash(gem:*)",
+      "Bash(RBENV_VERSION=3.1.2 ruby:*)",
+      "Bash(RBENV_VERSION=3.1.2 rails:*)",
+      "Bash(RBENV_VERSION=3.1.2 bundle install:*)",
+      "Bash(RBENV_VERSION=3.1.2 bundle exec:*)",
+      "Bash(brew services:*)",
+      "Bash(git status:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(agent-browser:*)",
+      "Bash(gh pr:*)"
+    ]
+  }
+}

@@ -4,7 +4,7 @@ module Api
 
     def index
       setlists = Band.find(params[:band_id]).setlists.order(date: :desc)
-      render json: setlists.as_json(only: [:id, :name, :date, :notes])
+      render json: setlists.as_json(only: [:id, :name, :date, :notes, :inter_song_gap_seconds])
     end
 
     def create
@@ -42,7 +42,7 @@ module Api
     end
 
     def setlist_params
-      params.require(:setlist).permit(:name, :date, :notes)
+      params.require(:setlist).permit(:name, :date, :notes, :inter_song_gap_seconds)
     end
   end
 end
