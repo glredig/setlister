@@ -22,7 +22,7 @@ const mockSetlistDetail = {
       id: 10,
       position: 1,
       song: { id: 1, title: 'Song A', artist: 'Artist A', tempo: 120, key: 'C', time_signature: '4/4', duration: 240 },
-      song_performance_config: { id: 100, lead_vocalist_id: null, backup_vocalist_ids: [], guitar_solo_id: null, instrument_overrides: {}, free_text_notes: '' },
+      song_performance_config: { id: 100, lead_vocalist_ids: [], backup_vocalist_ids: [], solos: [], instrument_overrides: {}, free_text_notes: '' },
     },
   ],
 };
@@ -40,7 +40,7 @@ describe('EditorLayout', () => {
   });
 
   it('renders both panels with setlist name', async () => {
-    renderWithTheme(<EditorLayout setlistId={1} bandId={1} />);
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
 
     await waitFor(() => {
       expect(screen.getByText('Friday Night Set')).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('EditorLayout', () => {
   });
 
   it('shows loading state initially', () => {
-    renderWithTheme(<EditorLayout setlistId={1} bandId={1} />);
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 });

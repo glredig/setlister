@@ -24,19 +24,20 @@ songs = songs_data.map { |data| Song.create!(data) }
 setlist = band.setlists.create!(name: "Friday Night Set", date: Date.new(2026, 3, 20), notes: "Opening night of spring tour")
 
 [
-  { song: songs[4], lead: mike, backups: [sarah], notes: "Start with bass riff, drums come in bar 5" },
-  { song: songs[2], lead: sarah, backups: [mike, jake], notes: "Mike on keys for this one" },
-  { song: songs[8], lead: jake, backups: [], notes: "Heavy intro, crowd hype" },
-  { song: songs[3], lead: mike, backups: [sarah, jake], notes: "Full energy, keep it tight" },
-  { song: songs[5], lead: sarah, backups: [], notes: "Jake guitar solo, Sarah on keys" },
-  { song: songs[7], lead: mike, backups: [sarah], notes: "Slow it down, build to crescendo" },
-  { song: songs[1], lead: sarah, backups: [mike, jake], notes: "Crowd singalong" },
-  { song: songs[9], lead: jake, backups: [mike], notes: "Close out the main set strong" }
+  { song: songs[4], leads: [mike], backups: [sarah], solos: [], notes: "Start with bass riff, drums come in bar 5" },
+  { song: songs[2], leads: [sarah], backups: [mike, jake], solos: [{ member_id: mike.id, instrument: "keys" }], notes: "Mike on keys for this one" },
+  { song: songs[8], leads: [jake], backups: [], solos: [], notes: "Heavy intro, crowd hype" },
+  { song: songs[3], leads: [mike], backups: [sarah, jake], solos: [], notes: "Full energy, keep it tight" },
+  { song: songs[5], leads: [sarah], backups: [], solos: [{ member_id: jake.id, instrument: "guitar" }], notes: "Jake guitar solo, Sarah on keys" },
+  { song: songs[7], leads: [mike], backups: [sarah], solos: [{ member_id: mike.id, instrument: "guitar" }], notes: "Slow it down, build to crescendo" },
+  { song: songs[1], leads: [sarah], backups: [mike, jake], solos: [], notes: "Crowd singalong" },
+  { song: songs[9], leads: [jake], backups: [mike], solos: [{ member_id: sarah.id, instrument: "guitar" }, { member_id: mike.id, instrument: "keys" }], notes: "Close out the main set strong" }
 ].each_with_index do |entry, i|
   ss = setlist.setlist_songs.create!(song: entry[:song], position: i + 1)
   ss.create_song_performance_config!(
-    lead_vocalist_id: entry[:lead].id,
+    lead_vocalist_ids: entry[:leads].map(&:id),
     backup_vocalist_ids: entry[:backups].map(&:id),
+    solos: entry[:solos],
     free_text_notes: entry[:notes]
   )
 end

@@ -14,7 +14,7 @@ class Setlist < ApplicationRecord
           include: {
             song: { only: [:id, :title, :artist, :tempo, :key, :time_signature, :duration] },
             song_performance_config: {
-              only: [:id, :lead_vocalist_id, :backup_vocalist_ids, :guitar_solo_id,
+              only: [:id, :lead_vocalist_ids, :backup_vocalist_ids, :solos,
                      :instrument_overrides, :free_text_notes]
             }
           }

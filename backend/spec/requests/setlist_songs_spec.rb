@@ -12,7 +12,7 @@ RSpec.describe "Setlist Songs Bulk Update API", type: :request do
 
       put "/api/setlists/#{setlist.id}/songs", params: {
         songs: [
-          { song_id: song1.id, position: 1, performance_config: { lead_vocalist_id: member.id } },
+          { song_id: song1.id, position: 1, performance_config: { lead_vocalist_ids: [member.id] } },
           { song_id: song2.id, position: 2, performance_config: { free_text_notes: "Big finish" } }
         ]
       }
@@ -21,7 +21,7 @@ RSpec.describe "Setlist Songs Bulk Update API", type: :request do
       json = JSON.parse(response.body)
       expect(json["setlist_songs"].length).to eq(2)
       expect(json["setlist_songs"][0]["song"]["title"]).to eq("Song A")
-      expect(json["setlist_songs"][0]["song_performance_config"]["lead_vocalist_id"]).to eq(member.id)
+      expect(json["setlist_songs"][0]["song_performance_config"]["lead_vocalist_ids"]).to eq([member.id])
       expect(json["setlist_songs"][1]["song"]["title"]).to eq("Song B")
       expect(json["setlist_songs"][1]["song_performance_config"]["free_text_notes"]).to eq("Big finish")
     end

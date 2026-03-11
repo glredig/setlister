@@ -36,7 +36,7 @@ RSpec.describe "Setlists API", type: :request do
       member = create(:member, band: band)
       create(:song_performance_config,
         setlist_song: setlist_song,
-        lead_vocalist_id: member.id,
+        lead_vocalist_ids: [member.id],
         free_text_notes: "Start soft"
       )
 
@@ -47,7 +47,7 @@ RSpec.describe "Setlists API", type: :request do
       expect(json["name"]).to eq(setlist.name)
       expect(json["setlist_songs"].length).to eq(1)
       expect(json["setlist_songs"][0]["song"]["title"]).to eq("Test Song")
-      expect(json["setlist_songs"][0]["song_performance_config"]["lead_vocalist_id"]).to eq(member.id)
+      expect(json["setlist_songs"][0]["song_performance_config"]["lead_vocalist_ids"]).to eq([member.id])
       expect(json["setlist_songs"][0]["song_performance_config"]["free_text_notes"]).to eq("Start soft")
     end
   end

@@ -78,8 +78,8 @@ describe('api.setlistSongs', () => {
     });
 
     const songs = [
-      { song_id: 1, position: 1, performance_config: {} },
-      { song_id: 2, position: 2, performance_config: {} },
+      { song_id: 1, position: 1, performance_config: { lead_vocalist_ids: [1], solos: [] } },
+      { song_id: 2, position: 2, performance_config: { lead_vocalist_ids: [], solos: [{ member_id: 1, instrument: 'guitar' }] } },
     ];
 
     const result = await api.setlistSongs.bulkUpdate(1, songs);

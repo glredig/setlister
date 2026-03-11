@@ -13,16 +13,20 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import styled from 'styled-components';
-import { SetlistSong } from '@/lib/types';
+import { SetlistSong, Member, SongPerformanceConfig } from '@/lib/types';
 import { SortableSetlistItem } from '@/components/Editor/SortableSetlistItem';
 
 interface SetlistPanelProps {
   setlistSongs: SetlistSong[];
   onReorder: (activeId: number, overId: number) => void;
   onRemove: (setlistSongId: number) => void;
+  expandedId: number | null;
+  onToggleExpand: (id: number) => void;
+  onConfigChange: (setlistSongId: number, config: SongPerformanceConfig) => void;
+  members: Member[];
 }
 
-export function SetlistPanel({ setlistSongs, onReorder, onRemove }: SetlistPanelProps) {
+export function SetlistPanel({ setlistSongs, onReorder, onRemove, expandedId, onToggleExpand, onConfigChange, members }: SetlistPanelProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -50,6 +54,11 @@ export function SetlistPanel({ setlistSongs, onReorder, onRemove }: SetlistPanel
                   setlistSong={ss}
                   index={index}
                   onRemove={onRemove}
+                  expanded={expandedId === ss.id}
+                  onToggleExpand={onToggleExpand}
+                  onConfigChange={onConfigChange}
+                  members={members}
+                  mode="edit"
                 />
               ))}
             </SongList>

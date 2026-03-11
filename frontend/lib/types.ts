@@ -23,9 +23,9 @@ export interface Song {
 
 export interface SongPerformanceConfig {
   id: number;
-  lead_vocalist_id: number | null;
+  lead_vocalist_ids: number[];
   backup_vocalist_ids: number[];
-  guitar_solo_id: number | null;
+  solos: Array<{ member_id: number; instrument: string }>;
   instrument_overrides: Record<string, string>;
   free_text_notes: string;
 }

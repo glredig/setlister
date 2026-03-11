@@ -13,13 +13,13 @@ const mockSetlistSongs = [
     id: 10,
     position: 1,
     song: { id: 1, title: 'Song A', artist: 'Artist A', tempo: 120, key: 'C', time_signature: '4/4', duration: 240 },
-    song_performance_config: { id: 100, lead_vocalist_id: null, backup_vocalist_ids: [], guitar_solo_id: null, instrument_overrides: {}, free_text_notes: '' },
+    song_performance_config: { id: 100, lead_vocalist_ids: [], backup_vocalist_ids: [], solos: [], instrument_overrides: {}, free_text_notes: '' },
   },
   {
     id: 11,
     position: 2,
     song: { id: 2, title: 'Song B', artist: 'Artist B', tempo: 140, key: 'G', time_signature: '4/4', duration: 200 },
-    song_performance_config: { id: 101, lead_vocalist_id: null, backup_vocalist_ids: [], guitar_solo_id: null, instrument_overrides: {}, free_text_notes: '' },
+    song_performance_config: { id: 101, lead_vocalist_ids: [], backup_vocalist_ids: [], solos: [], instrument_overrides: {}, free_text_notes: '' },
   },
 ];
 
@@ -30,6 +30,10 @@ describe('SetlistPanel', () => {
         setlistSongs={mockSetlistSongs}
         onReorder={jest.fn()}
         onRemove={jest.fn()}
+        expandedId={null}
+        onToggleExpand={jest.fn()}
+        onConfigChange={jest.fn()}
+        members={[]}
       />
     );
 
@@ -43,6 +47,10 @@ describe('SetlistPanel', () => {
         setlistSongs={[]}
         onReorder={jest.fn()}
         onRemove={jest.fn()}
+        expandedId={null}
+        onToggleExpand={jest.fn()}
+        onConfigChange={jest.fn()}
+        members={[]}
       />
     );
 
@@ -56,6 +64,10 @@ describe('SetlistPanel', () => {
         setlistSongs={mockSetlistSongs}
         onReorder={jest.fn()}
         onRemove={onRemove}
+        expandedId={null}
+        onToggleExpand={jest.fn()}
+        onConfigChange={jest.fn()}
+        members={[]}
       />
     );
 
