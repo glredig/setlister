@@ -42,6 +42,7 @@ export interface Setlist {
   name: string;
   date: string;
   notes: string;
+  inter_song_gap_seconds: number;
 }
 
 export interface SetlistDetail extends Setlist {

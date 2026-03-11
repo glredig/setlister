@@ -17,6 +17,7 @@ const mockSetlistDetail = {
   name: 'Friday Night Set',
   date: '2026-03-20',
   notes: '',
+  inter_song_gap_seconds: 30,
   setlist_songs: [
     {
       id: 10,

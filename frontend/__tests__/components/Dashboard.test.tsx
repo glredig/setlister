@@ -15,8 +15,8 @@ function renderWithTheme(ui: React.ReactElement) {
 describe('Dashboard', () => {
   it('renders setlist cards', async () => {
     mockedApi.setlists.list.mockResolvedValueOnce([
-      { id: 1, name: 'Friday Night Set', date: '2026-03-20', notes: 'Opening night' },
-      { id: 2, name: 'Saturday Matinee', date: '2026-03-21', notes: '' },
+      { id: 1, name: 'Friday Night Set', date: '2026-03-20', notes: 'Opening night', inter_song_gap_seconds: 30 },
+      { id: 2, name: 'Saturday Matinee', date: '2026-03-21', notes: '', inter_song_gap_seconds: 30 },
     ]);
 
     renderWithTheme(<Dashboard bandId={1} />);

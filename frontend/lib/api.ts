@@ -23,12 +23,12 @@ export const api = {
   setlists: {
     list: (bandId: number) => request<import('./types').Setlist[]>(`/api/bands/${bandId}/setlists`),
     get: (id: number) => request<import('./types').SetlistDetail>(`/api/setlists/${id}`),
-    create: (bandId: number, data: { name: string; date: string; notes?: string }) =>
+    create: (bandId: number, data: { name: string; date: string; notes?: string; inter_song_gap_seconds?: number }) =>
       request<import('./types').Setlist>(`/api/bands/${bandId}/setlists`, {
         method: 'POST',
         body: JSON.stringify({ setlist: data }),
       }),
-    update: (id: number, data: Partial<{ name: string; date: string; notes: string }>) =>
+    update: (id: number, data: Partial<{ name: string; date: string; notes: string; inter_song_gap_seconds: number }>) =>
       request<import('./types').Setlist>(`/api/setlists/${id}`, {
         method: 'PUT',
         body: JSON.stringify({ setlist: data }),
