@@ -20,6 +20,7 @@ export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) 
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [gapSeconds, setGapSeconds] = useState<number>(30);
 
   useEffect(() => {
     Promise.all([
@@ -29,6 +30,7 @@ export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) 
       setSetlist(setlistData);
       setSetlistSongs(setlistData.setlist_songs);
       setRepertoire(songsData);
+      setGapSeconds(setlistData.inter_song_gap_seconds);
     }).finally(() => setLoading(false));
   }, [setlistId, bandId]);
 
@@ -79,10 +81,16 @@ export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) 
     setIsDirty(true);
   };
 
+  const handleGapChange = (gap: number) => {
+    setGapSeconds(gap);
+    setIsDirty(true);
+  };
+
   const handleSave = async () => {
     if (!setlist) return;
     setIsSaving(true);
     try {
+      await api.setlists.update(setlist.id, { inter_song_gap_seconds: gapSeconds });
       const songs = setlistSongs.map((ss, index) => ({
         song_id: ss.song.id,
         position: index + 1,
@@ -106,6 +114,7 @@ export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) 
   const handleCancel = () => {
     if (!setlist) return;
     setSetlistSongs(setlist.setlist_songs);
+    setGapSeconds(setlist.inter_song_gap_seconds);
     setIsDirty(false);
   };
 
@@ -139,6 +148,8 @@ export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) 
           onToggleExpand={handleToggleExpand}
           onConfigChange={handleConfigChange}
           members={members}
+          gapSeconds={gapSeconds}
+          onGapChange={handleGapChange}
         />
       </Panels>
     </Container>

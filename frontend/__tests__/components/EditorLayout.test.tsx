@@ -54,4 +54,12 @@ describe('EditorLayout', () => {
     renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
+
+  it('displays the duration summary bar', async () => {
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Duration')).toBeInTheDocument();
+    });
+  });
 });
