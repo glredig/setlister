@@ -9,7 +9,7 @@ beforeEach(() => {
 
 describe('api.setlists', () => {
   it('list fetches setlists for a band', async () => {
-    const setlists = [{ id: 1, name: 'Friday Set', date: '2026-03-20', notes: '' }];
+    const setlists = [{ id: 1, name: 'Friday Set', date: '2026-03-20', notes: '', inter_song_gap_seconds: 30 }];
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -25,7 +25,7 @@ describe('api.setlists', () => {
   });
 
   it('create sends POST with setlist data', async () => {
-    const newSetlist = { id: 2, name: 'New Set', date: '2026-04-01', notes: '' };
+    const newSetlist = { id: 2, name: 'New Set', date: '2026-04-01', notes: '', inter_song_gap_seconds: 30 };
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 201,
@@ -41,6 +41,38 @@ describe('api.setlists', () => {
         body: JSON.stringify({ setlist: { name: 'New Set', date: '2026-04-01' } }),
       })
     );
+  });
+
+  it('creates a setlist with inter_song_gap_seconds', async () => {
+    const mockSetlist = { id: 1, name: 'Test', date: '2026-03-15', notes: '', inter_song_gap_seconds: 45 };
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve(mockSetlist),
+    });
+
+    const result = await api.setlists.create(1, { name: 'Test', date: '2026-03-15', inter_song_gap_seconds: 45 });
+
+    expect(result.inter_song_gap_seconds).toBe(45);
+    const fetchCall = mockFetch.mock.calls[0];
+    const body = JSON.parse(fetchCall[1].body);
+    expect(body.setlist.inter_song_gap_seconds).toBe(45);
+  });
+
+  it('updates a setlist with inter_song_gap_seconds', async () => {
+    const mockSetlist = { id: 1, name: 'Test', date: '2026-03-15', notes: '', inter_song_gap_seconds: 60 };
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve(mockSetlist),
+    });
+
+    const result = await api.setlists.update(1, { inter_song_gap_seconds: 60 });
+
+    expect(result.inter_song_gap_seconds).toBe(60);
+    const fetchCall = mockFetch.mock.calls[0];
+    const body = JSON.parse(fetchCall[1].body);
+    expect(body.setlist.inter_song_gap_seconds).toBe(60);
   });
 
   it('delete sends DELETE request', async () => {
@@ -68,7 +100,7 @@ describe('api.setlists', () => {
 describe('api.setlistSongs', () => {
   it('bulkUpdate sends PUT with songs array', async () => {
     const updatedSetlist = {
-      id: 1, name: 'Friday Set', date: '2026-03-20', notes: '',
+      id: 1, name: 'Friday Set', date: '2026-03-20', notes: '', inter_song_gap_seconds: 30,
       setlist_songs: [],
     };
     mockFetch.mockResolvedValueOnce({

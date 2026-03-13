@@ -15,6 +15,7 @@ import {
 import styled from 'styled-components';
 import { SetlistSong, Member, SongPerformanceConfig } from '@/lib/types';
 import { SortableSetlistItem } from '@/components/Editor/SortableSetlistItem';
+import { DurationSummary } from '@/components/Editor/DurationSummary';
 
 interface SetlistPanelProps {
   setlistSongs: SetlistSong[];
@@ -24,9 +25,11 @@ interface SetlistPanelProps {
   onToggleExpand: (id: number) => void;
   onConfigChange: (setlistSongId: number, config: SongPerformanceConfig) => void;
   members: Member[];
+  gapSeconds: number;
+  onGapChange: (gap: number) => void;
 }
 
-export function SetlistPanel({ setlistSongs, onReorder, onRemove, expandedId, onToggleExpand, onConfigChange, members }: SetlistPanelProps) {
+export function SetlistPanel({ setlistSongs, onReorder, onRemove, expandedId, onToggleExpand, onConfigChange, members, gapSeconds, onGapChange }: SetlistPanelProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -42,6 +45,11 @@ export function SetlistPanel({ setlistSongs, onReorder, onRemove, expandedId, on
   return (
     <Panel>
       <PanelHeader>Setlist</PanelHeader>
+      <DurationSummary
+        songDurations={setlistSongs.map((ss) => ss.song.duration)}
+        gapSeconds={gapSeconds}
+        onGapChange={onGapChange}
+      />
       {setlistSongs.length === 0 ? (
         <EmptyState>Add songs from the repertoire to get started</EmptyState>
       ) : (

@@ -14,6 +14,13 @@ RSpec.describe "Setlists API", type: :request do
       json = JSON.parse(response.body)
       expect(json.length).to eq(2)
     end
+
+    it "includes inter_song_gap_seconds in the list response" do
+      create(:setlist, band: band, inter_song_gap_seconds: 45)
+      get "/api/bands/#{band.id}/setlists"
+      json = JSON.parse(response.body)
+      expect(json[0]["inter_song_gap_seconds"]).to eq(45)
+    end
   end
 
   describe "POST /api/bands/:band_id/setlists" do
@@ -25,6 +32,13 @@ RSpec.describe "Setlists API", type: :request do
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
       expect(json["name"]).to eq("New Set")
+    end
+
+    it "defaults inter_song_gap_seconds to 30" do
+      post "/api/bands/#{band.id}/setlists", params: { setlist: { name: "Gap Test", date: "2026-03-15" } }
+      expect(response).to have_http_status(:created)
+      json = JSON.parse(response.body)
+      expect(json["inter_song_gap_seconds"]).to eq(30)
     end
   end
 
@@ -50,6 +64,14 @@ RSpec.describe "Setlists API", type: :request do
       expect(json["setlist_songs"][0]["song_performance_config"]["lead_vocalist_ids"]).to eq([member.id])
       expect(json["setlist_songs"][0]["song_performance_config"]["free_text_notes"]).to eq("Start soft")
     end
+
+    it "returns inter_song_gap_seconds in the response" do
+      setlist = create(:setlist, band: band, inter_song_gap_seconds: 45)
+      get "/api/setlists/#{setlist.id}"
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body)
+      expect(json["inter_song_gap_seconds"]).to eq(45)
+    end
   end
 
   describe "PUT /api/setlists/:id" do
@@ -60,6 +82,13 @@ RSpec.describe "Setlists API", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(setlist.reload.name).to eq("Updated Name")
+    end
+
+    it "updates inter_song_gap_seconds" do
+      setlist = create(:setlist, band: band)
+      put "/api/setlists/#{setlist.id}", params: { setlist: { inter_song_gap_seconds: 60 } }
+      expect(response).to have_http_status(:ok)
+      expect(setlist.reload.inter_song_gap_seconds).to eq(60)
     end
   end
 

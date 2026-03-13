@@ -21,7 +21,7 @@ songs_data = [
 
 songs = songs_data.map { |data| Song.create!(data) }
 
-setlist = band.setlists.create!(name: "Friday Night Set", date: Date.new(2026, 3, 20), notes: "Opening night of spring tour")
+setlist = band.setlists.create!(name: "Friday Night Set", date: Date.new(2026, 3, 20), notes: "Opening night of spring tour", inter_song_gap_seconds: 30)
 
 [
   { song: songs[4], leads: [mike], backups: [sarah], solos: [], notes: "Start with bass riff, drums come in bar 5" },

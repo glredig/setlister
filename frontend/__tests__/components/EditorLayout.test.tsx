@@ -17,6 +17,7 @@ const mockSetlistDetail = {
   name: 'Friday Night Set',
   date: '2026-03-20',
   notes: '',
+  inter_song_gap_seconds: 30,
   setlist_songs: [
     {
       id: 10,
@@ -52,5 +53,13 @@ describe('EditorLayout', () => {
   it('shows loading state initially', () => {
     renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
+  });
+
+  it('displays the duration summary bar', async () => {
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={[]} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Duration')).toBeInTheDocument();
+    });
   });
 });

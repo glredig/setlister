@@ -37,3 +37,6 @@ A feature is not merge-ready until existing tests pass alongside new ones. Regre
 
 ### Small Commits, Descriptive PRs
 Commit messages are one line. PR descriptions carry the context: what changed, why, how to test it. The commit log tells you what happened; the PR tells you why.
+
+### Feature Milestones Get PRs
+When a feature milestone (phase, epic, or significant chunk of work) is complete, always push the branch and create a Pull Request. Don't merge locally or leave branches sitting — PRs provide a review checkpoint and a record of what shipped together.

@@ -34,6 +34,8 @@ describe('SetlistPanel', () => {
         onToggleExpand={jest.fn()}
         onConfigChange={jest.fn()}
         members={[]}
+        gapSeconds={30}
+        onGapChange={jest.fn()}
       />
     );
 
@@ -51,6 +53,8 @@ describe('SetlistPanel', () => {
         onToggleExpand={jest.fn()}
         onConfigChange={jest.fn()}
         members={[]}
+        gapSeconds={30}
+        onGapChange={jest.fn()}
       />
     );
 
@@ -68,11 +72,32 @@ describe('SetlistPanel', () => {
         onToggleExpand={jest.fn()}
         onConfigChange={jest.fn()}
         members={[]}
+        gapSeconds={30}
+        onGapChange={jest.fn()}
       />
     );
 
     fireEvent.click(screen.getAllByRole('button', { name: /remove/i })[0]);
 
     expect(onRemove).toHaveBeenCalledWith(10);
+  });
+
+  it('renders the duration summary bar', () => {
+    renderWithTheme(
+      <SetlistPanel
+        setlistSongs={mockSetlistSongs}
+        onReorder={jest.fn()}
+        onRemove={jest.fn()}
+        expandedId={null}
+        onToggleExpand={jest.fn()}
+        onConfigChange={jest.fn()}
+        members={[]}
+        gapSeconds={30}
+        onGapChange={jest.fn()}
+      />
+    );
+
+    expect(screen.getByText('Duration')).toBeInTheDocument();
+    expect(screen.getByLabelText('Time between songs (seconds)')).toHaveValue(30);
   });
 });
