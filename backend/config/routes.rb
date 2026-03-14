@@ -10,6 +10,8 @@ Rails.application.routes.draw do
     resources :setlists, only: [:show, :update, :destroy] do
       put "songs", to: "setlist_songs#bulk_update", on: :member
     end
+    get 'member_song_notes', to: 'member_song_notes#index'
+    post 'member_song_notes', to: 'member_song_notes#upsert'
   end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

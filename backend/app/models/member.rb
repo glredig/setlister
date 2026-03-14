@@ -1,5 +1,6 @@
 class Member < ApplicationRecord
   belongs_to :band
+  has_many :member_song_notes, dependent: :destroy
 
   VALID_ROLES = %w[band_member engineer].freeze
 
