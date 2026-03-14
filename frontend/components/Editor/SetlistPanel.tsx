@@ -27,9 +27,11 @@ interface SetlistPanelProps {
   members: Member[];
   gapSeconds: number;
   onGapChange: (gap: number) => void;
+  memberNotes: Record<number, string>;
+  currentMemberId: number | null;
 }
 
-export function SetlistPanel({ setlistSongs, onReorder, onRemove, expandedId, onToggleExpand, onConfigChange, members, gapSeconds, onGapChange }: SetlistPanelProps) {
+export function SetlistPanel({ setlistSongs, onReorder, onRemove, expandedId, onToggleExpand, onConfigChange, members, gapSeconds, onGapChange, memberNotes, currentMemberId }: SetlistPanelProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -67,6 +69,8 @@ export function SetlistPanel({ setlistSongs, onReorder, onRemove, expandedId, on
                   onConfigChange={onConfigChange}
                   members={members}
                   mode="edit"
+                  memberNote={memberNotes[ss.id] ?? ''}
+                  currentMemberId={currentMemberId}
                 />
               ))}
             </SongList>

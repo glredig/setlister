@@ -58,4 +58,16 @@ export const api = {
       return request<import('./types').Song[]>(`/api/bands/${bandId}/songs${qs ? `?${qs}` : ''}`);
     },
   },
+
+  memberSongNotes: {
+    list: (setlistId: number, memberId: number) =>
+      request<import('./types').MemberSongNote[]>(
+        `/api/member_song_notes?setlist_id=${setlistId}&member_id=${memberId}`
+      ),
+    upsert: (data: import('./types').MemberSongNoteUpsert) =>
+      request<import('./types').MemberSongNote>(`/api/member_song_notes`, {
+        method: 'POST',
+        body: JSON.stringify({ member_song_note: data }),
+      }),
+  },
 };

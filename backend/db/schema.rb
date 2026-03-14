@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_11_184037) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_14_011257) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -18,6 +18,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_11_184037) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "member_song_notes", force: :cascade do |t|
+    t.bigint "member_id", null: false
+    t.bigint "setlist_song_id", null: false
+    t.text "note", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["member_id", "setlist_song_id"], name: "index_member_song_notes_on_member_id_and_setlist_song_id", unique: true
+    t.index ["member_id"], name: "index_member_song_notes_on_member_id"
+    t.index ["setlist_song_id"], name: "index_member_song_notes_on_setlist_song_id"
   end
 
   create_table "members", force: :cascade do |t|
@@ -76,6 +87,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_11_184037) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "member_song_notes", "members"
+  add_foreign_key "member_song_notes", "setlist_songs"
   add_foreign_key "members", "bands"
   add_foreign_key "setlist_songs", "setlists"
   add_foreign_key "setlist_songs", "songs"

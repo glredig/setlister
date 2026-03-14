@@ -4,6 +4,8 @@ import { ThemeProvider } from 'styled-components';
 import { theme } from '@/styles/theme';
 import { EditorLayout } from '@/components/Editor/EditorLayout';
 import { api } from '@/lib/api';
+import { MemberProvider } from '@/contexts/MemberContext';
+import { BandProvider } from '@/contexts/BandContext';
 
 jest.mock('@/lib/api');
 const mockedApi = jest.mocked(api);
@@ -12,8 +14,22 @@ jest.mock('next/router', () => ({
   useRouter: () => ({ push: jest.fn(), query: { id: '1' } }),
 }));
 
+const mockBand = {
+  id: 1,
+  name: 'Test Band',
+  members: [],
+};
+
 function renderWithTheme(ui: React.ReactElement) {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>);
+  return render(
+    <ThemeProvider theme={theme}>
+      <BandProvider bandId={1}>
+        <MemberProvider>
+          {ui}
+        </MemberProvider>
+      </BandProvider>
+    </ThemeProvider>
+  );
 }
 
 const mockSetlistDetail = {
@@ -39,8 +55,11 @@ const mockSongs = [
 
 describe('Editor save/cancel', () => {
   beforeEach(() => {
+    localStorage.clear();
+    mockedApi.bands.get.mockResolvedValue(mockBand);
     mockedApi.setlists.get.mockResolvedValue(mockSetlistDetail);
     mockedApi.songs.list.mockResolvedValue(mockSongs);
+    mockedApi.memberSongNotes.list.mockResolvedValue([]);
   });
 
   it('calls bulkUpdate on save', async () => {

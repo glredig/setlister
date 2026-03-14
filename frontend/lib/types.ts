@@ -48,3 +48,15 @@ export interface Setlist {
 export interface SetlistDetail extends Setlist {
   setlist_songs: SetlistSong[];
 }
+
+export interface MemberSongNote {
+  id: number;
+  setlist_song_id: number;
+  note: string;
+}
+
+export interface MemberSongNoteUpsert {
+  member_id: number;
+  setlist_song_id: number;
+  note: string;
+}

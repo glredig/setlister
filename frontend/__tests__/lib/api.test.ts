@@ -97,6 +97,59 @@ describe('api.setlists', () => {
   });
 });
 
+describe('memberSongNotes', () => {
+  it('lists notes for a member on a setlist', async () => {
+    const mockNotes = [{ id: 1, setlist_song_id: 10, note: 'Watch the bridge' }];
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve(mockNotes),
+    });
+
+    const result = await api.memberSongNotes.list(1, 5);
+
+    expect(result).toEqual(mockNotes);
+    const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+    expect(fetchCall[0]).toContain('/api/member_song_notes?setlist_id=1&member_id=5');
+  });
+
+  it('upserts a member note', async () => {
+    const mockNote = { id: 1, setlist_song_id: 10, note: 'Updated note' };
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve(mockNote),
+    });
+
+    const result = await api.memberSongNotes.upsert({
+      member_id: 5,
+      setlist_song_id: 10,
+      note: 'Updated note',
+    });
+
+    expect(result.note).toBe('Updated note');
+    const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+    expect(fetchCall[1].method).toBe('POST');
+    const body = JSON.parse(fetchCall[1].body);
+    expect(body.member_song_note.member_id).toBe(5);
+  });
+
+  it('returns undefined when upserting empty note (204)', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      status: 204,
+    });
+
+    const result = await api.memberSongNotes.upsert({
+      member_id: 5,
+      setlist_song_id: 10,
+      note: '',
+    });
+
+    expect(result).toBeUndefined();
+  });
+});
+
 describe('api.setlistSongs', () => {
   it('bulkUpdate sends PUT with songs array', async () => {
     const updatedSetlist = {

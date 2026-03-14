@@ -36,6 +36,8 @@ describe('SetlistPanel', () => {
         members={[]}
         gapSeconds={30}
         onGapChange={jest.fn()}
+        memberNotes={{}}
+        currentMemberId={null}
       />
     );
 
@@ -55,6 +57,8 @@ describe('SetlistPanel', () => {
         members={[]}
         gapSeconds={30}
         onGapChange={jest.fn()}
+        memberNotes={{}}
+        currentMemberId={null}
       />
     );
 
@@ -74,6 +78,8 @@ describe('SetlistPanel', () => {
         members={[]}
         gapSeconds={30}
         onGapChange={jest.fn()}
+        memberNotes={{}}
+        currentMemberId={null}
       />
     );
 
@@ -94,6 +100,8 @@ describe('SetlistPanel', () => {
         members={[]}
         gapSeconds={30}
         onGapChange={jest.fn()}
+        memberNotes={{}}
+        currentMemberId={null}
       />
     );
 

@@ -1,13 +1,17 @@
 import styled from 'styled-components';
 import { SongPerformanceConfig, Member } from '@/lib/types';
+import { MemberNoteTextarea } from '@/components/Editor/MemberNoteTextarea';
 
 interface PerformanceConfigFormProps {
   config: SongPerformanceConfig;
   members: Member[];
   onChange: (config: SongPerformanceConfig) => void;
+  memberNote?: string;
+  currentMemberId?: number | null;
+  setlistSongId?: number;
 }
 
-export function PerformanceConfigForm({ config, members, onChange }: PerformanceConfigFormProps) {
+export function PerformanceConfigForm({ config, members, onChange, memberNote, currentMemberId, setlistSongId }: PerformanceConfigFormProps) {
   const bandMembers = members.filter((m) => m.role === 'band_member');
   const backupEligible = bandMembers.filter((m) => !config.lead_vocalist_ids.includes(m.id));
   const multiInstrumentMembers = bandMembers.filter((m) => m.instruments.length >= 2);
@@ -177,6 +181,16 @@ export function PerformanceConfigForm({ config, members, onChange }: Performance
           aria-label="Notes"
         />
       </FieldGroup>
+
+      {currentMemberId && setlistSongId && (
+        <FieldGroup>
+          <MemberNoteTextarea
+            memberId={currentMemberId}
+            setlistSongId={setlistSongId}
+            initialNote={memberNote ?? ''}
+          />
+        </FieldGroup>
+      )}
     </FormContainer>
   );
 }

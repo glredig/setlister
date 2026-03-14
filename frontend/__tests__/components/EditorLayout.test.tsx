@@ -1,15 +1,33 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ThemeProvider } from 'styled-components';
 import { theme } from '@/styles/theme';
 import { EditorLayout } from '@/components/Editor/EditorLayout';
 import { api } from '@/lib/api';
+import { MemberProvider } from '@/contexts/MemberContext';
+import { BandProvider } from '@/contexts/BandContext';
 
 jest.mock('@/lib/api');
 const mockedApi = jest.mocked(api);
 
+const mockBand = {
+  id: 1,
+  name: 'Test Band',
+  members: [
+    { id: 1, name: 'Mike', instruments: ['guitar'], role: 'band_member' as const },
+  ],
+};
+
 function renderWithTheme(ui: React.ReactElement) {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>);
+  return render(
+    <ThemeProvider theme={theme}>
+      <BandProvider bandId={1}>
+        <MemberProvider>
+          {ui}
+        </MemberProvider>
+      </BandProvider>
+    </ThemeProvider>
+  );
 }
 
 const mockSetlistDetail = {
@@ -36,8 +54,11 @@ const mockSongs = [
 
 describe('EditorLayout', () => {
   beforeEach(() => {
+    localStorage.clear();
+    mockedApi.bands.get.mockResolvedValue(mockBand);
     mockedApi.setlists.get.mockResolvedValue(mockSetlistDetail);
     mockedApi.songs.list.mockResolvedValue(mockSongs);
+    mockedApi.memberSongNotes.list.mockResolvedValue([]);
   });
 
   it('renders both panels with setlist name', async () => {
@@ -60,6 +81,26 @@ describe('EditorLayout', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Duration')).toBeInTheDocument();
+    });
+  });
+
+  it('renders My Notes textarea when a member is selected', async () => {
+    localStorage.setItem('setlister_member_id_1', '1');
+    mockedApi.memberSongNotes.list.mockResolvedValue([
+      { id: 1, setlist_song_id: 10, note: 'My personal note' },
+    ]);
+
+    renderWithTheme(<EditorLayout setlistId={1} bandId={1} members={mockBand.members} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Friday Night Set')).toBeInTheDocument();
+    });
+
+    const songAMatches = screen.getAllByText('Song A');
+    fireEvent.click(songAMatches[songAMatches.length - 1]);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('My Notes')).toHaveValue('My personal note');
     });
   });
 });
