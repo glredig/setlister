@@ -14,9 +14,11 @@ interface SortableSetlistItemProps {
   onConfigChange: (setlistSongId: number, config: SongPerformanceConfig) => void;
   members: Member[];
   mode: 'edit' | 'live';
+  memberNote?: string;
+  currentMemberId?: number | null;
 }
 
-export function SortableSetlistItem({ setlistSong, index, onRemove, expanded, onToggleExpand, onConfigChange, members, mode }: SortableSetlistItemProps) {
+export function SortableSetlistItem({ setlistSong, index, onRemove, expanded, onToggleExpand, onConfigChange, members, mode, memberNote, currentMemberId }: SortableSetlistItemProps) {
   const {
     attributes,
     listeners,
@@ -85,6 +87,9 @@ export function SortableSetlistItem({ setlistSong, index, onRemove, expanded, on
             config={setlistSong.song_performance_config}
             members={members}
             onChange={(config) => onConfigChange(setlistSong.id, config)}
+            memberNote={memberNote}
+            currentMemberId={currentMemberId}
+            setlistSongId={setlistSong.id}
           />
         )}
       </div>

@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { SetlistDetail, SetlistSong, Song, Member, SongPerformanceConfig } from '@/lib/types';
 import { RepertoirePanel } from '@/components/Editor/RepertoirePanel';
 import { SetlistPanel } from '@/components/Editor/SetlistPanel';
+import { useMember } from '@/contexts/MemberContext';
 
 interface EditorLayoutProps {
   setlistId: number;
@@ -21,6 +22,8 @@ export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) 
   const [isSaving, setIsSaving] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [gapSeconds, setGapSeconds] = useState<number>(30);
+  const { currentMember } = useMember();
+  const [memberNotes, setMemberNotes] = useState<Record<number, string>>({});
 
   useEffect(() => {
     Promise.all([
@@ -33,6 +36,16 @@ export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) 
       setGapSeconds(setlistData.inter_song_gap_seconds);
     }).finally(() => setLoading(false));
   }, [setlistId, bandId]);
+
+  useEffect(() => {
+    if (!currentMember || loading) return;
+
+    api.memberSongNotes.list(setlistId, currentMember.id).then((notes) => {
+      const noteMap: Record<number, string> = {};
+      notes.forEach((n) => { noteMap[n.setlist_song_id] = n.note; });
+      setMemberNotes(noteMap);
+    });
+  }, [currentMember, setlistId, loading]);
 
   const handleAddSong = (song: Song) => {
     const newSetlistSong: SetlistSong = {
@@ -150,6 +163,8 @@ export function EditorLayout({ setlistId, bandId, members }: EditorLayoutProps) 
           members={members}
           gapSeconds={gapSeconds}
           onGapChange={handleGapChange}
+          memberNotes={memberNotes}
+          currentMemberId={currentMember?.id ?? null}
         />
       </Panels>
     </Container>
