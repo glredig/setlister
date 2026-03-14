@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "MemberSongNotes API" do
+RSpec.describe "MemberSongNotes API", type: :request do
   let(:band) { create(:band) }
   let(:member) { create(:member, band: band) }
   let(:setlist) { create(:setlist, band: band) }
