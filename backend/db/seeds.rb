@@ -42,4 +42,10 @@ setlist = band.setlists.create!(name: "Friday Night Set", date: Date.new(2026, 3
   )
 end
 
-puts "Seeded: #{Band.count} band, #{Member.count} members, #{Song.count} songs, #{Setlist.count} setlist with #{SetlistSong.count} songs"
+# Add some personal member notes
+setlist.setlist_songs.each do |ss|
+  MemberSongNote.create!(member: mike, setlist_song: ss, note: "Mike's note for #{ss.song.title}")
+end
+MemberSongNote.create!(member: sarah, setlist_song: setlist.setlist_songs.first, note: "Sarah: Remember to harmonize on chorus")
+
+puts "Seeded: #{Band.count} band, #{Member.count} members, #{Song.count} songs, #{Setlist.count} setlist with #{SetlistSong.count} songs, #{MemberSongNote.count} member notes"
